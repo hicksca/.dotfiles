@@ -1,0 +1,17 @@
+MY DOTFILES
+===========
+
+Automating so system setup on my work machine.
+
+Currently configured:
+[ ] git
+
+
+---
+
+ToDo:
+[ ] Setup stow config
+[ ] Add brew settings
+[ ] Add emacs config
+[ ] Chef config (will want to setup most of the above
+    using Chef

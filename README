@@ -3,15 +3,20 @@ MY DOTFILES
 
 Automating so system setup on my work machine.
 
-Currently configured:
-[ ] git
-
+Currently configured via homemanager:
+[x] vim 
+[x] bash
+[x] git
 
 ---
 
 ToDo:
-[ ] Setup stow config
-[ ] Add brew settings
-[ ] Add emacs config
-[ ] Chef config (will want to setup most of the above
-    using Chef
+[ ] bootstrapping script 
+    (nix/home manager does some of this)
+[ ] properly configure flake (ghostty)
+[ ] configure i3(/status bar)
+
+
+Notes:
+  - dev system in a nix vm
+

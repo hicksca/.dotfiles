@@ -13,10 +13,9 @@ Currently configured via homemanager:
 ToDo:
 [ ] bootstrapping script 
     (nix/home manager does some of this)
-[ ] properly configure flake (ghostty)
-[ ] configure i3(/status bar)
 
 
 Notes:
-  - dev system in a nix vm
+  - dev system in a nix vm (in orbstack)
+    (since boardcom takeover VMware fusion is annoying me)
 

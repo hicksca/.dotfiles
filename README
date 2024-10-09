@@ -11,9 +11,10 @@ Currently configured via homemanager:
 ---
 
 ToDo:
-[ ] bootstrapping script 
+[x] bootstrapping script - makefile ✓
     (nix/home manager does some of this)
-
+    [ ] need to handle gpg keys (ssh keys largely managed 
+        by orbstack)
 
 Notes:
   - dev system in a nix vm (in orbstack)

@@ -19,8 +19,8 @@ in
       userEmail = "cah@hicksca.dev";
 
       extraConfig = {
-        user.signingKey = "EBE68890";
-        commit.gpgSign = true;
+        # user.signingKey = "EBE68890";
+        # commit.gpgSign = true;
 
         alias.co = "checkout";
         alias.br = "branch";
@@ -58,23 +58,9 @@ in
       shellAliases = {
         nv = "nvim";
       };
+      initExtra = ''
+        eval -- "$(/home/cah/.nix-profile/bin/starship init bash --print-full-init)"
+      '';
     };
-
-    # SSH key management
-    home.file.".ssh/id_ed25519" = {
-      source = "/home/cah/.ssh/id_ed25519";
-    };
-
-    home.file.".ssh/id_ed25519.pub" = {
-      source = "/home/cah/.ssh/id_ed25519.pub";
-    };
-
-    home.file.".gnupg/gpg-agent.conf".text = ''
-      pinentry-program ${pkgs.pinentry-curses}/bin/pinentry-curses
-    '';
-
-    # Ensure GPG_TTY is set correctly
-    # home.sessionVariables.GPG_TTY = "xterm-kitty";
-
   };
 }

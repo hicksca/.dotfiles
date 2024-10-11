@@ -1,16 +1,15 @@
 orbctlPath := /usr/local/bin/orbctl
-machineName := nix-automation-test
+machineName := nix-automation-test2
 image := nixos:unstable
 srcCodeDir := /Users/cah/code
 srcConfigDir := /Users/cah/code/github.com/dotfiles/nix
-vmCodeDir := /home/cah/code  # Symlink will be created in the user's home directory
+vmCodeDir := /home/cah/code  
 vmConfigDir := /etc/nixos
 
 .PHONY: all createMachine removeMachine configureNixos
 
 all: createMachine configureNixos
 
-# Combine platform check, Orbstack check, and machine creation
 createMachine:
 	@if [ "$$(uname)" != "Darwin" ]; then \
 		echo "Error: This script is intended to run on macOS only."; \
@@ -31,7 +30,6 @@ createMachine:
 		echo "Machine $(machineName) created successfully."; \
 	fi
 
-# Remove the machine
 removeMachine:
 	@if $(orbctlPath) list | grep -q "$(machineName)"; then \
 		echo "Removing machine: $(machineName)..."; \
@@ -41,21 +39,28 @@ removeMachine:
 		echo "Error: Machine $(machineName) does not exist."; \
 	fi
 
-# Configure NixOS by symlinking and running setup commands
 configureNixos:
 	@echo "Checking if /etc/nixos/configuration.nix exists in the VM..."
-	$(orbctlPath) run sudo test -f $(vmConfigDir)/configuration.nix && \
-		$(orbctlPath) run sudo mv $(vmConfigDir)/configuration.nix $(vmConfigDir)/configuration.nix.old || true
-	@echo "Creating symlink for /Users/cah/code/ in the user's home directory on the VM..."
-	$(orbctlPath) run sudo ln -sf $(srcCodeDir) $(vmCodeDir)
+	$(orbctlPath) run -m $(machineName) sudo test -f $(vmConfigDir)/configuration.nix && \
+                $(orbctlPath) run -m $(machineName) sudo mv $(vmConfigDir)/configuration.nix $(vmConfigDir)/configuration.nix.old || true
+	@echo "Creating symlink for /Users/cah/code in the user's home directory on the VM..."
+	$(orbctlPath) run -m $(machineName) sudo -u cah ln -sfn /Users/cah/code /home/cah/code
 	@echo "Symlinking configuration files from $(srcConfigDir) to $(vmConfigDir)..."
-	$(orbctlPath) run sudo ln -sf $(srcConfigDir)/configuration.nix $(vmConfigDir)/configuration.nix
-	$(orbctlPath) run sudo ln -sf $(srcConfigDir)/global-apps.nix $(vmConfigDir)/global-apps.nix
-	$(orbctlPath) run sudo ln -sf $(srcConfigDir)/cah-home.nix $(vmConfigDir)/cah-home.nix
+	$(orbctlPath) run -m $(machineName) sudo ln -sfn $(srcConfigDir)/configuration.nix $(vmConfigDir)/configuration.nix
+	$(orbctlPath) run -m $(machineName) sudo ln -sfn $(srcConfigDir)/global-apps.nix $(vmConfigDir)/global-apps.nix
+	$(orbctlPath) run -m $(machineName) sudo ln -sfn $(srcConfigDir)/cah-home.nix $(vmConfigDir)/cah-home.nix
+	@echo "Verifying symlinks..."
+	$(orbctlPath) run -m $(machineName) ls -l $(vmConfigDir)
+	$(orbctlPath) run -m $(machineName) ls -l /home/cah
 	@echo "Applying NixOS configuration..."
-	$(orbctlPath) run sudo nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-	$(orbctlPath) run sudo nix-channel --update
-	$(orbctlPath) run sudo nixos-rebuild switch
+	$(orbctlPath) run -m $(machineName) sudo nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+	$(orbctlPath) run -m $(machineName) sudo nix-channel --update
+	$(orbctlPath) run -m $(machineName) sudo nixos-rebuild switch
+	@echo "Starting Tailscale..."
+	@read -p "Enter your Tailscale auth key: " AUTH_KEY; \
+	$(orbctlPath) run -m $(machineName) sudo tailscale up --ssh --authkey=$$AUTH_KEY
 	infocmp -x | ssh $(machineName)@orb -- tic -x -
 	@echo "NixOS configuration completed."
+	@echo "Verifying installation..."
+	$(orbctlPath) run -m $(machineName) which zsh nvim tailscale
 

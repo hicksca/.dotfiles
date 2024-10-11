@@ -25,12 +25,13 @@
     createHome = true;
     home = "/home/cah";
     homeMode = "700";
-    useDefaultShell = true;
+    shell = pkgs.zsh;
   };
+
+  programs.zsh.enable = true;
 
   security.sudo.wheelNeedsPassword = false;
 
-  # This being `true` leads to a few nasty bugs, change at your own risk!
   users.mutableUsers = false;
 
   time.timeZone = "America/New_York";
@@ -52,6 +53,9 @@
       linkConfig.RequiredForOnline = "routable";
     };
   };
+
+  services.tailscale.enable = true;
+  services.tailscale.useRoutingFeatures = "both";
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }

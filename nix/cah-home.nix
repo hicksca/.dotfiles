@@ -8,9 +8,12 @@ in
 
     # List your user-specific packages here
     home.packages = with pkgs; [
-      gh
+      # core tools
       starship
       fzf
+      tree
+      bat
+      gh #github cli
     ];
 
     # Git configuration
@@ -20,9 +23,6 @@ in
       userEmail = "cah@hicksca.dev";
 
       extraConfig = {
-        # user.signingKey = "EBE68890";
-        # commit.gpgSign = true;
-
         alias.co = "checkout";
         alias.br = "branch";
         alias.ci = "commit";
@@ -66,6 +66,7 @@ in
         eval -- "$(/home/cah/.nix-profile/bin/starship init zsh)"
         source ${pkgs.fzf}/share/fzf/key-bindings.zsh
         source ${pkgs.fzf}/share/fzf/completion.zsh
+        setopt autocd
       '';
       history = {
         size = 10000;
@@ -75,16 +76,18 @@ in
       };
       autocd = true;
     };
+    
     # fzf configuration
     programs.fzf = {
       enable = true;
       enableZshIntegration = true;
     };
+
     # Starship configuration
     programs.starship = {
       enable = true;
       settings = {
-        format = "$directory$git_branch$git_status$character";
+        format = "$nix_shell$directory$git_branch$git_status$character";
         add_newline = true;
         directory = {
           style = "blue";
@@ -110,6 +113,15 @@ in
         };
         username = {
           disabled = true;
+        };
+
+        # Configure the built-in nix_shell module
+        nix_shell = {
+          format = "[\\[$name:$state\\]]($style) ";
+          style = "bold blue";
+          impure_msg = "impure";
+          pure_msg = "pure";
+          disabled = false;
         };
       };
     };
